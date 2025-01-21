@@ -1,0 +1,69 @@
+---
+# defaults file for roles/prepare
+prepare_allow_reboot: false
+prepare_allow_upgrade: false
+prepare_add_apt_arvancloud_mirror: false
+prepare_change_dns: false
+
+prepare_hold_packages:
+  enable: false
+  list:
+    - linux-image-generic
+    - linux-headers-generic
+    - linux-image-virtual
+
+prepare_kernel_allow_upgrade: true
+prepare_kernel_packages:
+  - linux-headers-5.19.0-50-generic
+  - linux-image-5.19.0-50-generic
+  - linux-modules-5.19.0-50-generic
+  - linux-modules-extra-5.19.0-50-generic
+  - linux-tools-5.19.0-50-generic
+
+prepare_install_packages:
+  - software-properties-common
+  - nload
+  - tmux
+  - docker.io
+  - docker-compose
+  - containerd
+  - net-tools
+  - python3
+  - python3-pip
+  - telnet
+  - apache2-utils
+  - tcpdump
+  - git
+  - iperf3
+  - ipset
+  - traceroute
+  - htop
+  - vim
+  - iptables
+  - python3-venv
+  - libaugeas0
+  - iptables-persistent
+  - nano
+
+prepare_install_packages_deb:
+  - https://github.com/fail2ban/fail2ban/releases/download/1.1.0/fail2ban_1.1.0-1.upstream1_all.deb
+
+prepare_sysctl_configs: []
+  # - name: net.ipv4.ip_forward
+  #   value: 1
+  # - name: net.ipv6.conf.all.forwarding
+  #   value: 1
+
+prepare_fail2ban_allow_install: true
+
+prepare_fail2ban_ignore_ips:
+  - 127.0.0.1/32
+
+prepare_fail2ban_ban_config:
+  ban_time: 10d
+  find_time: 1m
+  max_retry: 3
+
+prepare_nameservers:
+  - 1.1.1.1
+  - 8.8.8.8

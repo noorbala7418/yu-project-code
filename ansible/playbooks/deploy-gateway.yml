@@ -1,0 +1,9 @@
+---
+- name: Deploy Gateway
+  hosts: gateway
+  gather_facts: true
+  become: true
+  roles:
+    - prepare
+    - haproxy
+    - exporters

@@ -1,0 +1,31 @@
+---
+- name: Check if resolv.conf file is linked
+  ansible.builtin.stat:
+    path: /etc/resolv.conf
+  register: resolve_conf_link
+
+- name: Disable systemd-resolved service
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: false
+    masked: true
+    daemon_reload: true
+  when: resolve_conf_link.stat.islnk
+
+- name: Unlink resolv.conf file
+  ansible.builtin.file:
+    path: /etc/resolv.conf
+    state: absent
+  when: resolve_conf_link.stat.islnk
+
+- name: Create new resolv.conf file
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

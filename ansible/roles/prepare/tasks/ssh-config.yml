@@ -1,0 +1,35 @@
+---
+- name: Add SSH keys
+  ansible.builtin.lineinfile:
+    path: "~/.ssh/authorized_keys"
+    line: "{{ item.key }}"
+    mode: '0600'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    # create: true
+  loop: "{{ prepare_ssh_keys }}"
+
+- name: Check sshd config backup file exists
+  ansible.builtin.stat:
+    path: /etc/ssh/sshd_config
+  register: sshd_config_back_exists
+
+- name: Create backup from sshd config
+  ansible.builtin.copy:
+    remote_src: true
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.bak
+    backup: true
+    owner: root
+    group: root
+    mode: '0644'
+  when: not sshd_config_back_exists.stat.exists
+
+- name: Copy sshd custom config
+  ansible.builtin.copy:
+    src: js-sshd-config.conf
+    dest: /etc/ssh/sshd_config.d/js-sshd-config.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart ssh service

@@ -1,0 +1,28 @@
+---
+# defaults file for ./roles/kube-prometheus-stack
+kps_extra_targets:
+  - job_name: infra-node-exporter
+    static_configs:
+      - targets:
+          - host-0:9100
+        labels:
+          group: 'infra'
+  - job_name: infra-ping-exporter
+    static_configs:
+      - targets:
+          - host-0:9427
+        labels:
+          group: 'infra'
+  - job_name: infra-haproxy-exporter
+    static_configs:
+      - targets:
+          - gw-0:9101
+        labels:
+          group: 'infra'
+  - job_name: ceph-exporter
+    static_configs:
+      - targets:
+          - proxmox-0:9283
+        labels:
+          group: 'kwc'
+          cluster: kwc-ceph

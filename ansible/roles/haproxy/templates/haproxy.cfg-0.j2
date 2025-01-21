@@ -1,0 +1,43 @@
+global
+        user        haproxy
+        group       haproxy
+        daemon
+        maxconn {{ (ansible_facts['processor_count'] / 2 * 100000) | int }}
+        cpu-map auto:1/1-{{ ansible_facts['processor_count'] | int }}  0-{{ ansible_facts['processor_count'] - 1 }}
+
+defaults
+        maxconn {{ (ansible_facts['processor_count'] / 2 * 100000) | int }}
+        timeout client          30s
+        timeout server          10s
+        timeout connect         5s
+        timeout tunnel          60s
+
+{% if haproxy_enable_metrics %}
+frontend stats
+        bind 0.0.0.0:{{ haproxy_metrics_port }}
+        http-request use-service prometheus-exporter if { path /metrics }
+        stats enable
+        mode http
+        stats uri /stats
+        stats refresh 5s
+{% else %}{% endif %}
+
+
+{% for config in haproxy_configs %}
+frontend {{ config.name.replace('.', '_').replace('-', '_') }}_frontend
+        bind        {{ config.frontend.bind }}
+        default_backend     {{ config.name.replace('.', '_').replace('-', '_') }}_backend
+
+backend {{ config.name.replace('.', '_').replace('-', '_') }}_backend
+        mode        {{ config.backend.mode }}
+        option      {{ config.backend.check_option }}
+        balance     {{ config.backend.balance }}
+
+{% for server in config.backend.servers %}
+        server {{ server.name }} {{ server.ip }}:{{ server.port }} check inter {{ config.backend.check_interval }} weight {{ server.weight | default(1) }}
+{% endfor %}
+{% for server in config.backend.backup_servers %}
+        server {{ server.name }} {{ server.ip }}:{{ server.port }} check inter {{ config.backend.check_interval }} weight {{ server.weight | default(1) }} backup
+{% endfor %}
+
+{% endfor %}

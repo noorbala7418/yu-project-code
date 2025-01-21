@@ -1,0 +1,68 @@
+---
+haproxy_configs:
+  - name: k8s-kubernetes-http
+    frontend:
+      bind: 0.0.0.0:80
+    backend:
+      mode: tcp
+      check_settings:
+        option: tcp-check
+        interval: 2s
+      balance: roundrobin
+      servers:
+        - name: k8s-node-0
+          ip: 192.168.50.40
+          port: 63080
+          weight: 1
+        - name: k8s-node-1
+          ip: 192.168.50.41
+          port: 63080
+          weight: 1
+        - name: k8s-node-2
+          ip: 192.168.50.42
+          port: 63080
+          weight: 1
+      backup_servers: []
+  - name: k8s-kubernetes-https
+    frontend:
+      bind: 0.0.0.0:443
+    backend:
+      mode: tcp
+      check_settings:
+        option: tcp-check
+        interval: 2s
+      balance: roundrobin
+      servers:
+        - name: k8s-node-0
+          ip: 192.168.50.40
+          port: 63443
+          weight: 1
+        - name: k8s-node-1
+          ip: 192.168.50.41
+          port: 63443
+          weight: 1
+        - name: k8s-node-2
+          ip: 192.168.50.42
+          port: 63443
+          weight: 1
+      backup_servers: []
+
+prepare_allow_reboot: true
+prepare_allow_upgrade: true
+prepare_add_apt_arvancloud_mirror: false
+prepare_change_dns: false
+
+prepare_hold_packages:
+  enable: false
+  list:
+    - linux-image-generic
+    - linux-headers-generic
+    - linux-image-virtual
+
+prepare_kernel_allow_upgrade: true
+prepare_kernel_packages:
+  - linux-headers-5.19.0-50-generic
+  - linux-image-5.19.0-50-generic
+  - linux-modules-5.19.0-50-generic
+  - linux-modules-extra-5.19.0-50-generic
+  - linux-tools-5.19.0-50-generic

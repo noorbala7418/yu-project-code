@@ -1,0 +1,17 @@
+---
+# defaults file for roles/haproxy
+# Docker images
+haproxy_docker_image: haproxy:2.9.2-alpine
+haproxy_exporter_docker_image: prom/haproxy-exporter:v0.14.0
+
+haproxy_config_directory: /etc/haproxy
+
+haproxy_container_name: haproxy
+haproxy_exporter_container_name: haproxy-exporter
+
+# Monitoring
+haproxy_enable_metrics: true
+haproxy_metrics_port: 8404
+haproxy_exporter_port: 9101
+
+haproxy_configs: []

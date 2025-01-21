@@ -1,0 +1,28 @@
+---
+- name: Run node-exporter container
+  community.docker.docker_container:
+    name: node-exporter
+    image: "{{ exporters_run.node_exporter.image }}"
+    network_mode: host
+    restart_policy: always
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.rootfs=/rootfs'
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^(sys|proc|dev|host|etc)($$|/)'
+      - '--web.listen-address=:{{ exporters_run.node_exporter.port }}'
+  when: exporters_run.node_exporter.enable
+
+- name: Remove node-exporter container
+  community.docker.docker_container:
+    name: node-exporter
+    state: absent
+  when: not exporters_run.node_exporter.enable | bool
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

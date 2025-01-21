@@ -1,0 +1,54 @@
+---
+# tasks file for roles/prepare
+- name: Fail if distrobution is NOT ubuntu
+  ansible.builtin.fail:
+    msg: Distro is not ubuntu
+  when: ansible_distribution != "Ubuntu"
+
+- name: Set FQDN hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Add hostname to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1 localhost'
+    line: "127.0.0.1 localhost {{ inventory_hostname }}"
+
+- name: Setup DNS Configs
+  ansible.builtin.import_tasks: "setup-dns.yml"
+  when: prepare_change_dns | bool
+
+- name: Install packages
+  ansible.builtin.import_tasks: "package-installer.yml"
+  tags:
+    - prepare_package_installer
+    - prepare_install_packages
+
+- name: Sysctl configs
+  ansible.builtin.import_tasks: "sysctl-settings.yml"
+  tags:
+    - prepare_sysctl_settings
+
+- name: Ssh configs
+  ansible.builtin.import_tasks: "ssh-config.yml"
+  tags:
+    - prepare_ssh
+
+- name: Fail2ban configurations
+  ansible.builtin.import_tasks: "setup-fail2ban.yml"
+  when: prepare_fail2ban_allow_install | bool
+  tags:
+    - prepare_fail2ban
+
+- name: Vim settings
+  ansible.builtin.import_tasks: "vim-settings.yml"
+
+- name: Prefer ipv4 to ipv6
+  ansible.builtin.import_tasks: "ipv4-ipv6-settings.yml"
+  tags:
+    - never
+    - prepare_ipv4_prefer
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

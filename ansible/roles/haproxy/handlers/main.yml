@@ -1,0 +1,7 @@
+---
+# handlers file for roles/haproxy
+- name: Restart haproxy container
+  community.docker.docker_container:
+    name: haproxy
+    restart: true
+

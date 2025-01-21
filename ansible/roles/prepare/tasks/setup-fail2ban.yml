@@ -1,0 +1,12 @@
+---
+- name: Copy fail2ban config
+  ansible.builtin.template:
+    src: fail2ban.conf.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart fail2ban service
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

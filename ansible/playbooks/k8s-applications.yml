@@ -1,0 +1,18 @@
+---
+- name: Run docker registry
+  hosts: kube_control_plane[0]
+  gather_facts: false
+  become: false
+  roles:
+    - ceph-rbd-csi
+  tags:
+    - ceph-rbd-csi
+
+- name: Run kube-prometheus-stack
+  hosts: kube_control_plane[0]
+  gather_facts: false
+  become: false
+  roles:
+    - kube-prometheus-stack
+  tags:
+    - kube-prometheus-stack

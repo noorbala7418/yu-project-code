@@ -1,0 +1,19 @@
+---
+# - name: Change sysctl settings
+#   ansible.posix.sysctl:
+#     name: "{{ item.name }}"
+#     value: "{{ item.value }}"
+#   loop: "{{ prepare_sysctl_configs }}"
+#   notify: Reboot system
+
+- name: Change sysctl settings
+  ansible.builtin.template:
+    src: sysctl-settings.conf.j2
+    dest: /etc/sysctl.d/99-jacksparrow.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reboot system
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

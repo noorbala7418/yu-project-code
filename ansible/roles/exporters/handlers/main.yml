@@ -1,0 +1,6 @@
+---
+# handlers file for roles/exporters
+- name: Restart ping-exporter container
+  community.docker.docker_container:
+    name: ping-exporter
+    restart: true

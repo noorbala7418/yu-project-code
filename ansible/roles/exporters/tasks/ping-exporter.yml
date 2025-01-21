@@ -1,0 +1,45 @@
+---
+- name: Create config directory for ping exporter
+  ansible.builtin.file:
+    dest: "{{ exporters_run.ping_exporter.config_path | dirname }}"
+    mode: '0755'
+    owner: root
+    group: root
+    recurse: true
+  when: exporters_run.ping_exporter.enable | bool
+
+- name: Create config file for ping exporter
+  ansible.builtin.template:
+    src: ping-exporter.yml.j2
+    dest: "{{ exporters_run.ping_exporter.config_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+    lstrip_blocks: true
+    trim_blocks: true
+  notify: Restart ping-exporter container
+  when: exporters_run.ping_exporter.enable | bool
+
+- name: Run ping exporter
+  community.docker.docker_container:
+    name: ping-exporter
+    image: "{{ exporters_run.ping_exporter.image }}"
+    restart_policy: always
+    user: root
+    network_mode: host
+    volumes:
+      - "{{ exporters_run.ping_exporter.config_path }}:/config/config.yml"
+    command:
+      - '/app/ping_exporter'
+      - '--web.listen-address=0.0.0.0:{{ exporters_run.ping_exporter.port }}'
+      - '--config.path=/config/config.yml'
+  when: exporters_run.ping_exporter.enable | bool
+
+- name: Remove ping exporter container
+  community.docker.docker_container:
+    name: ping-exporter
+    state: absent
+  when: not exporters_run.ping_exporter.enable | bool
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

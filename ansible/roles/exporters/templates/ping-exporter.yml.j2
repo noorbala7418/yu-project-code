@@ -1,0 +1,20 @@
+---
+targets:
+{% for target in exporters_run.ping_exporter.configs.targets %}
+  - {{ target }}
+{% endfor %}
+
+dns:
+  refresh: {{ exporters_run.ping_exporter.configs.settings.dns_refresh_time }}
+  nameserver: {{ exporters_run.ping_exporter.configs.settings.dns_addr }}
+
+ping:
+  interval: {{ exporters_run.ping_exporter.configs.settings.interval }}
+  timeout: {{ exporters_run.ping_exporter.configs.settings.timeout }}
+  history-size: {{ exporters_run.ping_exporter.configs.settings.history_size }}
+  size: {{ exporters_run.ping_exporter.configs.settings.size }}
+
+options:
+{% for option in exporters_run.ping_exporter.configs.options %}
+  {{ option }}
+{% endfor %}

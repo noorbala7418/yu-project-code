@@ -1,0 +1,44 @@
+---
+- name: Create haproxy directory
+  ansible.builtin.file:
+    dest: "{{ haproxy_config_directory }}"
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+
+- name: Copy HAproxy configs
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_config_directory }}/haproxy.cfg"
+    owner: root
+    group: root
+    mode: '0644'
+    lstrip_blocks: true
+    trim_blocks: true
+  notify: Restart haproxy container
+
+- name: Run haproxy container
+  community.docker.docker_container:
+    name: "{{ haproxy_container_name }}"
+    image: "{{ haproxy_docker_image }}"
+    network_mode: host
+    hostname: haproxy
+    restart_policy: always
+    user: root
+    volumes:
+      - "{{ haproxy_config_directory }}:/usr/local/etc/haproxy:ro"
+
+- name: Run haproxy-exporter container
+  community.docker.docker_container:
+    name: "{{ haproxy_exporter_container_name }}"
+    image: "{{ haproxy_exporter_docker_image }}"
+    hostname: haproxy-exporter
+    network_mode: host
+    restart_policy: always
+    command:
+      - '--haproxy.scrape-uri=http://127.0.0.1:{{ haproxy_metrics_port }}/stats?stats;csv'
+  when: haproxy_enable_metrics | bool
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

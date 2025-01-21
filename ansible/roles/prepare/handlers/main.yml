@@ -1,0 +1,26 @@
+---
+# handlers file for roles/prepare
+- name: Reboot system
+  ansible.builtin.reboot:
+    msg: Reboot initiated by Ansible
+  when: prepare_allow_reboot
+
+- name: Restart ssh service
+  ansible.builtin.systemd:
+    name: ssh
+    state: restarted
+    enabled: true
+
+- name: Restart fail2ban service
+  ansible.builtin.systemd:
+    name: fail2ban
+    enabled: true
+    state: restarted
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Update grub
+  ansible.builtin.command: update-grub
+  changed_when: false

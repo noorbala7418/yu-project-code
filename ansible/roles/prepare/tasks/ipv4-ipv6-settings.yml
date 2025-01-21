@@ -1,0 +1,11 @@
+---
+# https://weblog.lkiesow.de/20220311-make-linux-prefer-ipv4.html
+
+- name: Copy gai.conf to prefer ipv4
+  ansible.builtin.copy:
+    src: gai.conf
+    dest: /etc/gai.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true

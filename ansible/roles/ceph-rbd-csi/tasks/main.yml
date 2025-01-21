@@ -1,0 +1,22 @@
+---
+# tasks file for roles/ceph-rbd-csi
+
+- name: Add ceph-csi-rbd helm repository
+  kubernetes.core.helm_repository:
+    name: "ceph-csi"
+    repo_url: https://ceph.github.io/csi-charts
+  delegate_to: localhost
+  run_once: true
+
+- name: Deploy ceph-csi-rbd
+  kubernetes.core.helm:
+    name: ceph-csi-rbd
+    chart_ref: ceph-csi/ceph-csi-rbd
+    release_namespace: ceph-csi-rbd
+    create_namespace: true
+    kubeconfig: "{{ gloabl_kwc_kubeconfig }}"
+    update_repo_cache: true
+    chart_version: 3.11.0
+    values: "{{ lookup('template', 'kwc-values.yaml.j2') | from_yaml }}"
+  delegate_to: localhost
+  run_once: true

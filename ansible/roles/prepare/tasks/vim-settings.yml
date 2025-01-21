@@ -1,0 +1,11 @@
+---
+- name: Copy vim settings to root directory
+  ansible.builtin.copy:
+    src: vim.vimrc
+    dest: /root/.vimrc
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

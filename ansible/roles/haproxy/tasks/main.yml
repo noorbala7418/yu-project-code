@@ -1,0 +1,9 @@
+---
+# tasks file for roles/haproxy
+- name: Run haproxy
+  ansible.builtin.import_tasks: "haproxy-forwarder.yml"
+  tags:
+    - haproxy
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

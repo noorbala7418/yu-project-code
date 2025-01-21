@@ -1,0 +1,4 @@
+---
+prepare_sysctl_configs:
+  - name: vm.max_map_count
+    value: 262144
