@@ -1,5 +1,5 @@
 ---
-- name: Run docker registry
+- name: Run ceph-rbd-csi
   hosts: kube_control_plane[0]
   gather_facts: false
   become: false
